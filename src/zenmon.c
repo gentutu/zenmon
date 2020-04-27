@@ -160,29 +160,9 @@ int main(int argc, char* const argv[]) //---------------------------------------
     {
         ioctl(STDOUT_FILENO, TIOCGWINSZ, &nowTerm); // get the terminal size
 
-        // if the terminal size changed, refresh the static status boxes
-        if((oldTerm.ws_row != nowTerm.ws_row) || \
-           (oldTerm.ws_col != nowTerm.ws_col))
-        {
-              svi2Pos.xPos = (nowTerm.ws_col - LEN_TOTAL_W_X) / 2u                + 1u;
-              svi2Pos.yPos = (nowTerm.ws_row - LEN_TOTAL_W_Y) / 2u;
-              loadPos.xPos = (nowTerm.ws_col - LEN_TOTAL_W_X) / 2u                + 1u;
-              loadPos.yPos = (nowTerm.ws_row - LEN_TOTAL_W_Y) / 2u + LEN_SVI2_W_Y;
-            eGraphPos.xPos = (nowTerm.ws_col - LEN_TOTAL_W_X) / 2u + LEN_SVI2_W_X + 1u;
-            eGraphPos.yPos = (nowTerm.ws_row - LEN_TOTAL_W_Y) / 2u;
-            tGraphPos.xPos = (nowTerm.ws_col - LEN_TOTAL_W_X) / 2u + LEN_SVI2_W_X + 1u;
-            tGraphPos.yPos = (nowTerm.ws_row - LEN_TOTAL_W_Y) / 2u + LEN_ELEC_W_Y;
-
-            CLEAR_SCREEN;
-            box_svi2(  "SVI2 Overview"   ,   svi2Pos.xPos,   svi2Pos.yPos, F_BLU);
-            box_load(  "System Load"     ,   loadPos.xPos,   loadPos.yPos, F_BLU);
-            box_eGraph("SVI2 Core cV/A/W", eGraphPos.xPos, eGraphPos.yPos, F_BLU);
-            box_tGraph("SVI2 CPU °C"     , tGraphPos.xPos, tGraphPos.yPos, F_BLU);
-        }
-
         // check the terminal window size
-        if(((LEN_SVI2_W_X + LEN_ELEC_W_X + 6) > nowTerm.ws_col) || \
-           ((LEN_SVI2_W_Y + LEN_LOAD_W_Y + 2) > nowTerm.ws_row))
+        if(((LEN_TOTAL_W_X + 6) > nowTerm.ws_col) || \
+           ((LEN_TOTAL_W_Y + 2) > nowTerm.ws_row))
         {
             CLEAR_SCREEN;
             PRINT_FAIL("Terminal size too small; resize it to display data...");
@@ -194,6 +174,26 @@ int main(int argc, char* const argv[]) //---------------------------------------
         }
         else // start normal operation
         {
+            // if the terminal size changed, refresh the static status boxes
+            if((oldTerm.ws_row != nowTerm.ws_row) || \
+               (oldTerm.ws_col != nowTerm.ws_col))
+            {
+                  svi2Pos.xPos = (nowTerm.ws_col - LEN_TOTAL_W_X) / 2u                + 1u;
+                  svi2Pos.yPos = (nowTerm.ws_row - LEN_TOTAL_W_Y) / 2u;
+                  loadPos.xPos = (nowTerm.ws_col - LEN_TOTAL_W_X) / 2u                + 1u;
+                  loadPos.yPos = (nowTerm.ws_row - LEN_TOTAL_W_Y) / 2u + LEN_SVI2_W_Y;
+                eGraphPos.xPos = (nowTerm.ws_col - LEN_TOTAL_W_X) / 2u + LEN_SVI2_W_X + 1u;
+                eGraphPos.yPos = (nowTerm.ws_row - LEN_TOTAL_W_Y) / 2u;
+                tGraphPos.xPos = (nowTerm.ws_col - LEN_TOTAL_W_X) / 2u + LEN_SVI2_W_X + 1u;
+                tGraphPos.yPos = (nowTerm.ws_row - LEN_TOTAL_W_Y) / 2u + LEN_ELEC_W_Y;
+
+                CLEAR_SCREEN;
+                box_svi2(  "SVI2 Overview"   ,   svi2Pos.xPos,   svi2Pos.yPos, F_BLU);
+                box_load(  "System Load"     ,   loadPos.xPos,   loadPos.yPos, F_BLU);
+                box_eGraph("SVI2 Core cV/A/W", eGraphPos.xPos, eGraphPos.yPos, F_BLU);
+                box_tGraph("SVI2 CPU °C"     , tGraphPos.xPos, tGraphPos.yPos, F_BLU);
+            }
+
             // acquire and process the data
             num_getSvi2();
             num_getLoad();
