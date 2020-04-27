@@ -28,7 +28,7 @@ typedef struct metricTypeTag // data related to a single zenpower metric
     uint32  now;
     uint32  max;
     uint32  avg;
-    uint16  hst[LEN_GR_D_X];
+    uint16  hst[LEN_PLOT_D_X];
 } metricType;
 
 typedef struct metricsTypeTag // all zenpower metrics
@@ -47,16 +47,16 @@ typedef struct metricsTypeTag // all zenpower metrics
 
 typedef struct graphBufferTypeTag // graph buffers
 {
-    uint8 vcore[LEN_GR_BUF]; // millivolts
-    uint8 acore[LEN_GR_BUF]; //     amperes
-    uint8 wcore[LEN_GR_BUF]; //     watts
-    uint8  vsoc[LEN_GR_BUF]; // millivolts
-    uint8  asoc[LEN_GR_BUF]; //     amperes
-    uint8  wsoc[LEN_GR_BUF]; //     watts
-    uint8  cdie[LEN_GR_BUF]; //    °Celsius
-    uint8  cctl[LEN_GR_BUF]; //    °Celsius
-    uint8 cccd0[LEN_GR_BUF]; //    °Celsius
-    uint8 cccd1[LEN_GR_BUF]; //    °Celsius
+    uint8 vcore[LEN_PLOT_BUF]; // millivolts
+    uint8 acore[LEN_PLOT_BUF]; //     amperes
+    uint8 wcore[LEN_PLOT_BUF]; //     watts
+    uint8  vsoc[LEN_PLOT_BUF]; // millivolts
+    uint8  asoc[LEN_PLOT_BUF]; //     amperes
+    uint8  wsoc[LEN_PLOT_BUF]; //     watts
+    uint8  cdie[LEN_PLOT_BUF]; //    °Celsius
+    uint8  cctl[LEN_PLOT_BUF]; //    °Celsius
+    uint8 cccd0[LEN_PLOT_BUF]; //    °Celsius
+    uint8 cccd1[LEN_PLOT_BUF]; //    °Celsius
 } graphBufferType;
 
 typedef struct cpuUsgTypeTag // cpu thread usage

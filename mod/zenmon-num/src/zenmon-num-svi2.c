@@ -46,7 +46,7 @@ static void svi2_setSingleAvg(metricType* const metric) //----------------------
 
     (*metric).avg = 0u;
 
-    for(index = LEN_GR_D_X - AVG_CYCLES; index < LEN_GR_D_X; index++)
+    for(index = LEN_PLOT_D_X - AVG_CYCLES; index < LEN_PLOT_D_X; index++)
     {
         (*metric).avg += (*metric).hst[index];
     }

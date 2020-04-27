@@ -153,7 +153,7 @@ int main(int argc, char* const argv[]) //---------------------------------------
 
     num_init();
     dot_init();
-    braille_init(LEN_GR_C_X); // set graph width in characters
+    braille_init(LEN_PLOT_C_X); // set graph width in characters
 
     // fill boxes
     while(UNTIL_SIGNAL)
@@ -164,14 +164,14 @@ int main(int argc, char* const argv[]) //---------------------------------------
         if((oldTerm.ws_row != nowTerm.ws_row) || \
            (oldTerm.ws_col != nowTerm.ws_col))
         {
-              svi2Pos.xPos = (nowTerm.ws_col - LEN_TOTAL_W_X) / 2u + 1u;
+              svi2Pos.xPos = (nowTerm.ws_col - LEN_TOTAL_W_X) / 2u                + 1u;
               svi2Pos.yPos = (nowTerm.ws_row - LEN_TOTAL_W_Y) / 2u;
-              loadPos.xPos = (nowTerm.ws_col - LEN_TOTAL_W_X) / 2u + 1u;
+              loadPos.xPos = (nowTerm.ws_col - LEN_TOTAL_W_X) / 2u                + 1u;
               loadPos.yPos = (nowTerm.ws_row - LEN_TOTAL_W_Y) / 2u + LEN_SVI2_W_Y;
-            eGraphPos.xPos = (nowTerm.ws_col - LEN_TOTAL_W_X) / 2u + 1u + LEN_SVI2_W_X;
+            eGraphPos.xPos = (nowTerm.ws_col - LEN_TOTAL_W_X) / 2u + LEN_SVI2_W_X + 1u;
             eGraphPos.yPos = (nowTerm.ws_row - LEN_TOTAL_W_Y) / 2u;
-            tGraphPos.xPos = (nowTerm.ws_col - LEN_TOTAL_W_X) / 2u + 1u + LEN_SVI2_W_X;
-            tGraphPos.yPos = (nowTerm.ws_row - LEN_TOTAL_W_Y) / 2u + LEN_EG_W_Y;
+            tGraphPos.xPos = (nowTerm.ws_col - LEN_TOTAL_W_X) / 2u + LEN_SVI2_W_X + 1u;
+            tGraphPos.yPos = (nowTerm.ws_row - LEN_TOTAL_W_Y) / 2u + LEN_ELEC_W_Y;
 
             CLEAR_SCREEN;
             box_svi2(  "SVI2 Overview"   ,   svi2Pos.xPos,   svi2Pos.yPos, F_BLU);
@@ -181,7 +181,7 @@ int main(int argc, char* const argv[]) //---------------------------------------
         }
 
         // check the terminal window size
-        if(((LEN_SVI2_W_X + LEN_EG_W_X   + 6) > nowTerm.ws_col) || \
+        if(((LEN_SVI2_W_X + LEN_ELEC_W_X + 6) > nowTerm.ws_col) || \
            ((LEN_SVI2_W_Y + LEN_LOAD_W_Y + 2) > nowTerm.ws_row))
         {
             CLEAR_SCREEN;
@@ -217,7 +217,7 @@ int main(int argc, char* const argv[]) //---------------------------------------
 
     // unreachable
     zenmon_signalHandler();
-    return EXIT_SUCCESS;
+    return EXIT_FAILURE;
 }
 
 //======================================================================================================================
