@@ -100,13 +100,13 @@ void box_load(const sint8* title, uint16 const xPos, uint16 const yPos, const si
 
 void box_eGraph(const sint8* title, uint16 const xPos, uint16 const yPos, const sint8* colour) //------------ box_eGraph
 {
-    box_draw(xPos, yPos, LEN_EG_W_X, LEN_EG_W_Y, colour);
+    box_draw(xPos, yPos, LEN_ELEC_W_X, LEN_ELEC_W_Y, colour);
     PRINTL(xPos + 2u, yPos, " %s ", title);
 }
 
 void box_tGraph(const sint8* title, uint16 const xPos, const uint16 yPos, const sint8* colour) //------------ box_tGraph
 {
-    box_draw(xPos, yPos, LEN_CG_W_X, LEN_CG_W_Y, colour);
+    box_draw(xPos, yPos, LEN_TEMP_W_X, LEN_TEMP_W_Y, colour);
     PRINTL(xPos + 2u, yPos, " %s ", title);
 }
 

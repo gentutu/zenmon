@@ -23,16 +23,16 @@
 
 // graph scales and alarm thresholds; these numbers depend of the definitions of graph sizes from zenmon-cfg.h
 #define C_D_VALUE    5u    // each Braille dot represents 5 °C; 0 - 100 scale
-#define LIM_C        60u   // °C; multiple of (C_D_VALUE * LEN_GR_D_Y)
+#define LIM_C        60u   // °C; multiple of (C_D_VALUE * LEN_PLOT_D_Y)
 
 #define V_D_VALUE    75u   // each Braille dot represents 75 millivolts; 0 - 1500 scale
-#define LIM_V        1200u // millivolts; multiple of (V_D_VALUE * LEN_GR_D_Y)
+#define LIM_V        1200u // millivolts; multiple of (V_D_VALUE * LEN_PLOT_D_Y)
 
 #define A_D_VALUE    8u    // each Braille dot represents 8 amperes; 0 - 160 scale
-#define LIM_A        128   // amperes; multiple of (A_D_VALUE * LEN_GR_D_Y)
+#define LIM_A        128   // amperes; multiple of (A_D_VALUE * LEN_PLOT_D_Y)
 
 #define W_D_VALUE    10u   // each Braille dot represents 10 watts; 0 - 200 scale
-#define LIM_W        160u  // watts; multiple of (W_D_VALUE * LEN_GR_D_Y)
+#define LIM_W        160u  // watts; multiple of (W_D_VALUE * LEN_PLOT_D_Y)
 
 //======================================================================================================================
 // END OF FILE
