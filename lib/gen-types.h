@@ -47,13 +47,14 @@
 #define F_WHT "\e[0;37m"
 
 // terminal management
-#define CURSOR_HIDE     printf("\e[?25l")
-#define CURSOR_SHOW     printf("\e[?25h")
-#define CLEAR_SCREEN    printf("\e[1;1H\e[2J")
-#define TERM_NAME(name) printf("\033]0;%s\007", name)
+#define CURSOR_HIDE             printf("\e[?25l")
+#define CURSOR_SHOW             printf("\e[?25h")
+#define CURSOR_JUMP(yPos, xPos) printf("\033[%d;%dH", yPos, xPos)
+#define CLEAR_SCREEN            printf("\e[1;1H\e[2J")
+#define TERM_NAME(name)         printf("\033]0;%s\007", name)
 
 // jump cursor and print
-#define PRINTL(xPos, yPos, ...) printf("\033[%d;%dH", yPos, xPos); printf(__VA_ARGS__); printf("%s", F_RST)
+#define PRINTL(xPos, yPos, ...) CURSOR_JUMP(yPos, xPos); printf(__VA_ARGS__); printf("%s", F_RST)
 
 //======================================================================================================================
 // TYPES

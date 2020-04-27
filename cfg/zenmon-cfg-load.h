@@ -16,10 +16,6 @@
 #define FILE_USG          "/proc/stat"        // cpu thread usage
 #define FILE_RAM          "/proc/meminfo"     // RAM        usage
 
-// load window size
-#define LEN_LOAD_W_X      47u                 // window X size in characters
-#define LEN_LOAD_W_Y      25u                 // window Y size in characters
-
 // static configuration
 #define CPU_CORES         16u
 #define CPU_THREADS       32u

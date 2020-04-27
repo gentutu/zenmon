@@ -18,10 +18,6 @@
 #define FILE_CCCD0 "/sys/devices/pci0000:00/0000:00:18.3/hwmon/hwmon0/temp3_input"  // ccd0 temperature
 #define FILE_CCCD1 "/sys/devices/pci0000:00/0000:00:18.3/hwmon/hwmon0/temp4_input"  // ccd1 temperature
 
-// svi2 window size
-#define LEN_SVI2_W_X 47u   // window X size in characters
-#define LEN_SVI2_W_Y 14u   // window Y size in characters
-
 // static config
 #define AVG_CYCLES   10u
 

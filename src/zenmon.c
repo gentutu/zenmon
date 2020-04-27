@@ -133,10 +133,10 @@ int main(int argc, char* const argv[]) //---------------------------------------
     struct winsize nowTerm;
 
     // set window coordinates
-    const coordType svi2Pos   = { 4u,  2u};
-    const coordType loadPos   = { 4u, 16u};
-    const coordType eGraphPos = {51u,  2u};
-    const coordType tGraphPos = {51u, 19u};
+    coordType svi2Pos;
+    coordType loadPos;
+    coordType eGraphPos;
+    coordType tGraphPos;
 
     // initialize to 0, so in the first iteration the window borders will be printed
     oldTerm.ws_row = 0;
@@ -150,7 +150,6 @@ int main(int argc, char* const argv[]) //---------------------------------------
     setlocale(LC_ALL, "");                 // enable Braille support
     zenmon_getopt(argc, argv);
     CURSOR_HIDE;
-    TERM_NAME("zenmon");
 
     num_init();
     dot_init();
@@ -165,6 +164,15 @@ int main(int argc, char* const argv[]) //---------------------------------------
         if((oldTerm.ws_row != nowTerm.ws_row) || \
            (oldTerm.ws_col != nowTerm.ws_col))
         {
+              svi2Pos.xPos = (nowTerm.ws_col - LEN_TOTAL_W_X) / 2u + 1u;
+              svi2Pos.yPos = (nowTerm.ws_row - LEN_TOTAL_W_Y) / 2u;
+              loadPos.xPos = (nowTerm.ws_col - LEN_TOTAL_W_X) / 2u + 1u;
+              loadPos.yPos = (nowTerm.ws_row - LEN_TOTAL_W_Y) / 2u + LEN_SVI2_W_Y;
+            eGraphPos.xPos = (nowTerm.ws_col - LEN_TOTAL_W_X) / 2u + 1u + LEN_SVI2_W_X;
+            eGraphPos.yPos = (nowTerm.ws_row - LEN_TOTAL_W_Y) / 2u;
+            tGraphPos.xPos = (nowTerm.ws_col - LEN_TOTAL_W_X) / 2u + 1u + LEN_SVI2_W_X;
+            tGraphPos.yPos = (nowTerm.ws_row - LEN_TOTAL_W_Y) / 2u + LEN_EG_W_Y;
+
             CLEAR_SCREEN;
             box_svi2(  "SVI2 Overview"   ,   svi2Pos.xPos,   svi2Pos.yPos, F_BLU);
             box_load(  "System Load"     ,   loadPos.xPos,   loadPos.yPos, F_BLU);
@@ -173,7 +181,7 @@ int main(int argc, char* const argv[]) //---------------------------------------
         }
 
         // check the terminal window size
-        if(((LEN_SVI2_W_X + LEN_EG_W_X   + 5) > nowTerm.ws_col) || \
+        if(((LEN_SVI2_W_X + LEN_EG_W_X   + 6) > nowTerm.ws_col) || \
            ((LEN_SVI2_W_Y + LEN_LOAD_W_Y + 2) > nowTerm.ws_row))
         {
             CLEAR_SCREEN;
