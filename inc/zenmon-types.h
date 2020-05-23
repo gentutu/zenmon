@@ -21,7 +21,7 @@
 //======================================================================================================================
 // TYPES
 //======================================================================================================================
-typedef struct metricTypeTag // data related to a single zenpower metric
+typedef struct metricTypeTag // data related to a single k10temp metric
 {
       FILE* FD;
     uint32  min;
@@ -31,7 +31,7 @@ typedef struct metricTypeTag // data related to a single zenpower metric
     uint16  hst[LEN_PLOT_D_X];
 } metricType;
 
-typedef struct metricsTypeTag // all zenpower metrics
+typedef struct metricsTypeTag // all k10temp metrics
 {
     metricType vcore; // millivolts
     metricType acore; //     amperes

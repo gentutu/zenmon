@@ -64,22 +64,20 @@ void svi2_init(metricsType* const inDB) //--------------------------------------
 
 void svi2_getStatus(void) //----------------------------------------------------------------------------- svi2_getStatus
 {
-    // zenmon has an issue in that it only reports half of the A/W being used, so the divider for A/W is halved for now
-
     // electrical
-    (*mDB).vcore.now = svi2_getSingleStatus((*mDB).vcore.FD);                              // mV
-    (*mDB).acore.now = svi2_getSingleStatus((*mDB).acore.FD); (*mDB).acore.now /= 500u;    //  A; zenpower issue here
-    (*mDB).wcore.now = svi2_getSingleStatus((*mDB).wcore.FD); (*mDB).wcore.now /= 500000u; //  W; zenpower issue here
+    (*mDB).vcore.now = svi2_getSingleStatus((*mDB).vcore.FD);                            // mV
+    (*mDB).acore.now = svi2_getSingleStatus((*mDB).acore.FD); (*mDB).acore.now /= 1000u; //  A
+    (*mDB).wcore.now = (*mDB).vcore.now * (*mDB).acore.now / 1000u;                      //  W
 
-    (*mDB).vsoc.now  = svi2_getSingleStatus((*mDB).vsoc.FD);                               // mv
-    (*mDB).asoc.now  = svi2_getSingleStatus((*mDB).asoc.FD);  (*mDB).asoc.now  /= 500u;    //  A; zenpower issue here
-    (*mDB).wsoc.now  = svi2_getSingleStatus((*mDB).wsoc.FD);  (*mDB).wsoc.now  /= 500000u; //  W; zenpower issue here
+    (*mDB).vsoc.now  = svi2_getSingleStatus((*mDB).vsoc.FD);                             // mv
+    (*mDB).asoc.now  = svi2_getSingleStatus((*mDB).asoc.FD); (*mDB).asoc.now  /= 1000u;  //  A
+    (*mDB).wsoc.now  = (*mDB).vsoc.now * (*mDB).asoc.now / 1000u;                        //  W
 
     // temperature
-    (*mDB).cdie.now  = svi2_getSingleStatus((*mDB).cdie.FD);  (*mDB).cdie.now  /= 1000u;   // °C
-    (*mDB).cctl.now  = svi2_getSingleStatus((*mDB).cctl.FD);  (*mDB).cctl.now  /= 1000u;   // °C
-    (*mDB).cccd0.now = svi2_getSingleStatus((*mDB).cccd0.FD); (*mDB).cccd0.now /= 1000u;   // °C
-    (*mDB).cccd1.now = svi2_getSingleStatus((*mDB).cccd1.FD); (*mDB).cccd1.now /= 1000u;   // °C
+    (*mDB).cdie.now  = svi2_getSingleStatus((*mDB).cdie.FD);  (*mDB).cdie.now  /= 1000u; // °C
+    (*mDB).cctl.now  = svi2_getSingleStatus((*mDB).cctl.FD);  (*mDB).cctl.now  /= 1000u; // °C
+    (*mDB).cccd0.now = svi2_getSingleStatus((*mDB).cccd0.FD); (*mDB).cccd0.now /= 1000u; // °C
+    (*mDB).cccd1.now = svi2_getSingleStatus((*mDB).cccd1.FD); (*mDB).cccd1.now /= 1000u; // °C
 }
 
 void svi2_setMinMax(void) //----------------------------------------------------------------------------- svi2_setMinMax

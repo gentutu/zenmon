@@ -20,14 +20,6 @@
 #define LEN_PLOT_C_Y     (LEN_PLOT_D_Y / 4u)           // graph Y size in characters
 #define LEN_PLOT_BUF     (LEN_PLOT_C_X * LEN_PLOT_C_Y)
 
-// svi2 window size
-#define LEN_SVI2_W_X     47u                           // X size in characters
-#define LEN_SVI2_W_Y     14u                           // Y size in characters
-
-// load window size
-#define LEN_LOAD_W_X     47u                           // X size in characters
-#define LEN_LOAD_W_Y     25u                           // Y size in characters
-
 // electrical graphs window size; 3 stacked graphs: core mV, A and W
 #define LEN_ELEC_W_X     (LEN_PLOT_D_X / 2u     ) + 4u // X size in characters
 #define LEN_ELEC_W_Y     (LEN_PLOT_D_Y / 4u * 3u) + 2u // Y size in characters
