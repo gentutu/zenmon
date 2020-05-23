@@ -38,7 +38,7 @@ static void load_getMemUsg() //-------------------------------------------------
     fseek((*sDB).ramFD, 0, SEEK_SET);
     while(NULL != fgets(line, LEN_LINE, (*sDB).ramFD))
     {
-        // this if is VERY barbaric, but it's MUCH faster than strstr
+        // this if is VERY barbaric, but it's much faster than strstr
         if(('F' == line[3]) && ('r' == line[4])) // found "MemFree"
         {
             freeMem = ((atoi(line + RAM_AVAIL_OFFSET) / 1000u)); // MiB
@@ -141,7 +141,7 @@ static void load_getCpuMhz(void) //---------------------------------------------
     fseek((*sDB).mhzFD, 0, SEEK_SET); // go back to the start of the file
     while(NULL != fgets(line, LEN_LINE, (*sDB).mhzFD))
     {
-        // this if is VERY barbaric, but it's MUCH faster than strstr
+        // this if is VERY barbaric, but it's much faster than strstr
         if((' ' == line[3]) && ('M' == line[4])) // pattern found: "cpu Mhz"
         {
             // the first half of the threads are physical cores; the rest are virtual cores (on SMT CPUs)

@@ -52,11 +52,9 @@ void num_init(void) //----------------------------------------------------------
     // open file descriptors
     failure |= num_openFile(&(mDB.vcore.FD), FILE_VCORE);
     failure |= num_openFile(&(mDB.acore.FD), FILE_ACORE);
-    failure |= num_openFile(&(mDB.wcore.FD), FILE_WCORE);
 
     failure |= num_openFile(&(mDB.vsoc.FD) , FILE_VSOC);
     failure |= num_openFile(&(mDB.asoc.FD) , FILE_ASOC);
-    failure |= num_openFile(&(mDB.wsoc.FD) , FILE_WSOC);
 
     failure |= num_openFile(&(mDB.cdie.FD) , FILE_CDIE);
     failure |= num_openFile(&(mDB.cctl.FD) , FILE_CCTL);
@@ -99,11 +97,9 @@ void num_deinit(void) //--------------------------------------------------------
     // close file descriptors; technically the OS does this by itself, but it doesn't hurt doing it here
     if(NULL != mDB.vcore.FD) fclose(mDB.vcore.FD);
     if(NULL != mDB.acore.FD) fclose(mDB.acore.FD);
-    if(NULL != mDB.wcore.FD) fclose(mDB.wcore.FD);
 
     if(NULL != mDB.vsoc.FD ) fclose(mDB.vsoc.FD);
     if(NULL != mDB.asoc.FD ) fclose(mDB.asoc.FD);
-    if(NULL != mDB.wsoc.FD ) fclose(mDB.wsoc.FD);
 
     if(NULL != mDB.cdie.FD ) fclose(mDB.cdie.FD);
     if(NULL != mDB.cctl.FD ) fclose(mDB.cctl.FD);

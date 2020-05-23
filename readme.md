@@ -1,7 +1,7 @@
 ## zenmon
 
 ### Introduction
-`zenmon` is a top-like CLI monitoring tool for AMD Ryzen CPUs written in C. It uses `zenpower` to display the electrical and temperature statistics of the CPU in a way that is pleasing to the eye, at least for me. It also displays generic information related to the overall system load:
+`zenmon` is a top-like CLI monitoring tool for AMD Ryzen CPUs written in C. It uses `k10temp` to display the electrical and temperature statistics of the CPU in a way that is pleasing to the eye, at least for me. It also displays generic information related to the overall system load:
 * Uptime
 * Number of processes
 * CPU usage for the past 1, 5 and 15 minutes
@@ -32,8 +32,6 @@ At this point I would consider it feature-complete. I will certainly maintain/im
 ### Buliding
 #### Dependencies
 * GNU `make`
-* `zenpower` (https://github.com/ocerman/zenpower)
-    * without this, `k10temp` only exposes the die and ctl temperatures
 * A Ryzen CPU (see the section below)
 * `ncurses` is **not** needed; I did the cursor jumping myself
 
@@ -42,28 +40,26 @@ At this point I would consider it feature-complete. I will certainly maintain/im
     * AMD Ryzen 9 3950X
     * AMD Ryzen 9 3900X (for the most part; see below)
 * Supported after changing some code:
-    * Any other Ryzen CPU that `zenpower` supports
+    * Any other Ryzen CPU that `k10temp` supports with voltage, current and temperature
 
 #### More on the topic of compatible CPUs
-* It all depends on the files `zenpower` exposes; for the supported CPUs the files are as follows:
-    * core voltage: in1_input
+* It all depends on the files `k10temp` exposes; for the supported CPUs the files are as follows:
+    * core voltage: in0_input
     * core current: curr1_input
-    * core power: power1_input
-    * soc voltage: in2_input
+    * soc voltage: in1_input
     * soc current: curr2_input
-    * soc power: power2_input
     * die temperature: temp1_input
     * ctl temperature: temp2_input
     * ccd0 temperature: temp3_input
     * ccd1 temperature: temp4_input
-* In case of other Ryzen CPUs, whatever `zenpower` decides to expose can be read by this program
-* At run-time, all the required system files are checked; if any are missing, the program will notify and exit gracefully
-* The only Ryzen CPU I have access to is my 3950X, so this is what I can test it on
+* In case of other Ryzen CPUs, whatever `k10temp` decides to expose can be read by `zenmon`
+* At run-time, all the required system files are checked; if any are missing, `zenmon` will notify and exit gracefully
+* The only Ryzen CPU I have access to is my 3950X, so this is what I can fully test it on
 
 #### Modifications needed for unsupported CPUs
 * In case of the 3900X, the MHz and usage bars for the last 4 cores will contain invalid values; otherwise it works as intended. The core/thread config can be changed in `zenmon-cfg-load.h` and the windows can be re-structured in `zenmon-num-load.c`
 * For other CPUs:
-    * remove (or add if you have a Threadripper supported by `zenpower`) the extra file(s) handling
+    * remove (or add if you have a Threadripper CPU) the extra file(s) handling (temperatures for missing/extra CCDs)
     * the `cfg` directory and `zenmon-types.h` are good starting points; go top-down from there; I am talking about defines (especially for the system files from where I acquire various data) and structure members
     * then see my previous point about the 3900X
 * Restructure the content of the windows; see the `zenmon-box`, `zenmon-num` and `zenmon-dot` modules' APIs
@@ -81,13 +77,12 @@ Just call it from the newly-created `out` directory and it will run with a sampl
 
 ---
 ### Issues
-* The terminal window stays renamed to `zenmon` even after exiting the program; I would need to save the current name before changing it, but from what I understand, the way a terminal is named varies from one terminal emulator to another (`$TERM`, for example, is useless for `Alacritty`)
+* This piece of software contains only features
 
 ---
 ### Limitations
 I might get to these at some point:
 * As mentioned above, the supported CPU list barely exceedes 1 item and is not auto-detected
-* Currently `zenpower` only reports half of the current and power being used by the processor; `zenmon` fixes this by doubling the acquired amount, but if `zenpower` gets fixed, this will need to be updated (in `zenmon-num-svi2.c`)
 * Used memory is calculated as (Total - Free - Buffers - Cached), which also means:
     * `tmpfs` usage is not taken into account
     * I did not get the memory info from `sysinfo` because it has no data on cached RAM
