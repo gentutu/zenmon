@@ -12,13 +12,13 @@
 // DEFINES
 //======================================================================================================================
 // file paths; these are checked at runtime and if any are missing the program will notify and exit
-#define FILE_MHZ          "/proc/cpuinfo"     // cpu core   frequency
-#define FILE_USG          "/proc/stat"        // cpu thread usage
-#define FILE_RAM          "/proc/meminfo"     // RAM        usage
+#define FILE_MHZ         "/proc/cpuinfo"      // cpu core   frequency
+#define FILE_USG         "/proc/stat"         // cpu thread usage
+#define FILE_RAM         "/proc/meminfo"      // RAM        usage
 
 // load window size
-#define LEN_LOAD_W_X     47u                  // X size in characters
-#define LEN_LOAD_W_Y     25u                  // Y size in characters
+#define LEN_LOAD_W_X      47u                 // X size in characters
+#define LEN_LOAD_W_Y      25u                 // Y size in characters
 
 // static configuration
 #define CPU_CORES         16u
@@ -27,8 +27,8 @@
 #define LEN_LINE          512u                // I don't expect any lines to be longet than this while reading
 
 // RAM usage bar config
-#define RAM_BAR_LEN       (LEN_LOAD_W_X - 4u) // RAM bar length in characters
-#define RAM_BAR_LIM       (RAM_BAR_LEN  / 2u) // bar turns red at 50% RAM usage
+#define RAM_BAR_LEN      (LEN_LOAD_W_X - 4u) // RAM bar length in characters
+#define RAM_BAR_LIM      (RAM_BAR_LEN  / 2u) // bar turns red at 50% RAM usage
 #define RAM_AVAIL_OFFSET  13u                 // characters to skip when reading the available RAM line
 #define RAM_TOTAL_OFFSET  9u                  // characters to skip when reading the total     RAM line
 

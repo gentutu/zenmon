@@ -27,8 +27,8 @@
 // DEFINES
 //======================================================================================================================
 #define VERSION_MAJOR 1
-#define VERSION_MINOR 1
-#define VERSION_PATCH 0
+#define VERSION_MINOR 2
+#define VERSION_PATCH 1
 
 #define UNTIL_SIGNAL 1
 
@@ -139,8 +139,8 @@ int main(int argc, char* const argv[]) //---------------------------------------
     coordType tGraphPos;
 
     // initialize to 0, so in the first iteration the window borders will be printed
-    oldTerm.ws_row = 0;
-    oldTerm.ws_col = 0;
+    oldTerm.ws_row = 0u;
+    oldTerm.ws_col = 0u;
 
     signal(SIGINT , zenmon_signalHandler); // handle keyboard interrupt
     signal(SIGTERM, zenmon_signalHandler); // handle termination
@@ -161,8 +161,8 @@ int main(int argc, char* const argv[]) //---------------------------------------
         ioctl(STDOUT_FILENO, TIOCGWINSZ, &nowTerm); // get the terminal size
 
         // check the terminal window size
-        if(((LEN_TOTAL_W_X + 6) > nowTerm.ws_col) || \
-           ((LEN_TOTAL_W_Y + 2) > nowTerm.ws_row))
+        if(((LEN_TOTAL_W_X + 6u) > nowTerm.ws_col) || \
+           ((LEN_TOTAL_W_Y + 2u) > nowTerm.ws_row))
         {
             CLEAR_SCREEN;
             PRINT_FAIL("Terminal size too small; resize it to display data...");

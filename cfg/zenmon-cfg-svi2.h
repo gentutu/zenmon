@@ -7,14 +7,14 @@
 // DEFINES
 //======================================================================================================================
 // file paths; these are checked at runtime and if any are missing the program will notify and exit
-#define FILE_VCORE "/sys/devices/pci0000:00/0000:00:18.3/hwmon/hwmon0/in0_input"    // core voltage
-#define FILE_ACORE "/sys/devices/pci0000:00/0000:00:18.3/hwmon/hwmon0/curr1_input"  // core current
-#define FILE_VSOC  "/sys/devices/pci0000:00/0000:00:18.3/hwmon/hwmon0/in1_input"    // soc  voltage
-#define FILE_ASOC  "/sys/devices/pci0000:00/0000:00:18.3/hwmon/hwmon0/curr2_input"  // soc  current
-#define FILE_CDIE  "/sys/devices/pci0000:00/0000:00:18.3/hwmon/hwmon0/temp1_input"  // core temperature
-#define FILE_CCTL  "/sys/devices/pci0000:00/0000:00:18.3/hwmon/hwmon0/temp2_input"  // ctl  temperature
-#define FILE_CCCD0 "/sys/devices/pci0000:00/0000:00:18.3/hwmon/hwmon0/temp3_input"  // ccd0 temperature
-#define FILE_CCCD1 "/sys/devices/pci0000:00/0000:00:18.3/hwmon/hwmon0/temp4_input"  // ccd1 temperature
+#define FILE_VCORE  "/sys/devices/pci0000:00/0000:00:18.3/hwmon/hwmon0/in0_input"    // core voltage
+#define FILE_ACORE  "/sys/devices/pci0000:00/0000:00:18.3/hwmon/hwmon0/curr1_input"  // core current
+#define FILE_VSOC   "/sys/devices/pci0000:00/0000:00:18.3/hwmon/hwmon0/in1_input"    // soc  voltage
+#define FILE_ASOC   "/sys/devices/pci0000:00/0000:00:18.3/hwmon/hwmon0/curr2_input"  // soc  current
+#define FILE_CDIE   "/sys/devices/pci0000:00/0000:00:18.3/hwmon/hwmon0/temp1_input"  // core temperature
+#define FILE_CCTL   "/sys/devices/pci0000:00/0000:00:18.3/hwmon/hwmon0/temp2_input"  // ctl  temperature
+#define FILE_CCCD0  "/sys/devices/pci0000:00/0000:00:18.3/hwmon/hwmon0/temp3_input"  // ccd0 temperature
+#define FILE_CCCD1  "/sys/devices/pci0000:00/0000:00:18.3/hwmon/hwmon0/temp4_input"  // ccd1 temperature
 
 // svi2 window size
 #define LEN_SVI2_W_X 47u   // X size in characters
