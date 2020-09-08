@@ -105,7 +105,12 @@ static void load_getCpuUsg(void) //---------------------------------------------
             if(NULL != token)
             {
                 sum += atoi(token);
-                if(tokenIndex == 3u) idle = atoi(token);
+
+                if(3u == tokenIndex)
+                {
+                    idle = atoi(token);
+                }
+
                 tokenIndex++;
             }
         }

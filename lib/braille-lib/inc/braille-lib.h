@@ -46,7 +46,7 @@
 // C D
 // E F
 // G H
-static enum brailleBitsEnumTypeTag
+static const enum brailleBitsEnumTypeTag
 {
     FIELD_A = 1 << 0,
     FIELD_B = 1 << 3,

@@ -36,8 +36,8 @@ static sint32 svi2_getSingleStatus(FILE* const file) //-------------------------
 
 static void svi2_setSingleMinMax(metricType* const type) //---------------------------------------- svi2_setSingleMinMax
 {
-    if((*type).min > (*type).now) (*type).min = (*type).now;
-    if((*type).now > (*type).max) (*type).max = (*type).now;
+    (*type).min = GETMIN((*type).min, (*type).now);
+    (*type).max = GETMAX((*type).max, (*type).now);
 }
 
 static void svi2_setSingleAvg(metricType* const metric) //-------------------------------------------- svi2_setSingleAvg

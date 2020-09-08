@@ -54,7 +54,27 @@
 #define TERM_NAME(name)         printf("\033]0;%s\007", name)
 
 // jump cursor and print
-#define PRINTL(xPos, yPos, ...) CURSOR_JUMP(yPos, xPos); printf(__VA_ARGS__); printf("%s", F_RST)
+#define PRINTL(xPos, yPos, ...) do { CURSOR_JUMP(yPos, xPos); printf(__VA_ARGS__); printf("%s", F_RST); } while(0)
+
+// bit manipulation
+#define GETBIT(num, pos)             (((num) & (  0x01 << (pos))) ? 1 : 0)
+#define SETBIT(num, pos)              ((num) | (  0x01 << (pos)))
+#define CLRBIT(num, pos)              ((num) & (~(0x01 << (pos))))
+#define TGLBIT(num, pos)              ((num) ^ (  0x01 << (pos)))
+
+#define GETNIBBLE(num, pos)         ((((num) & (  0x0F << ((pos) * 4))))              >> ((pos) * 4))
+#define SETNIBBLE(num, pos, nibble) ((((num) & (~(0x0F << ((pos) * 4))))) | ((nibble) << ((pos) * 4)))
+#define CLRNIBBLE(num, pos)          (((num) & (~(0x0F << ((pos) * 4)))))
+#define TGLNIBBLE(num, pos)         ((((num) ^ (  0x0F << ((pos) * 4)))))
+
+#define GETBYTE(num, pos)           ((((num) & (  0xFF << ((pos) * 8)))            >> ((pos) * 8)))
+#define SETBYTE(num, pos, byte)      (((num) & (~(0xFF << ((pos) * 8)))) | ((byte) << ((pos) * 8)))
+#define CLRBYTE(num, pos)            (((num) & (~(0xFF << ((pos) * 8)))))
+#define TGLBYTE(num, pos)           ((((num) ^ (  0xFF << ((pos) * 8)))))
+
+// others
+#define GETMAX(num1, num2)           (((num1) > (num2)) ? (num1) : (num2))
+#define GETMIN(num1, num2)           (((num1) < (num2)) ? (num1) : (num2))
 
 //======================================================================================================================
 // TYPES
@@ -79,7 +99,7 @@
 #define SINT32_MAX           2147483647
 #define SINT64_MAX  9223372036854775807
 
-// these data type sizes are based on my machine (3950X + Linux 64-bit; I use Arch btw)
+// these are platform-dependant
 typedef unsigned         char   uint8; //                          0 ...                        255
 typedef unsigned short    int  uint16; //                          0 ...                     65.535
 typedef unsigned          int  uint32; //                          0 ...              4.294.967.295
