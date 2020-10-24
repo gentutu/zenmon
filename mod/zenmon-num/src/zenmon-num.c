@@ -106,9 +106,9 @@ void num_deinit(void) //--------------------------------------------------------
     if(NULL != mDB.cccd0.FD) fclose(mDB.cccd0.FD);
     if(NULL != mDB.cccd1.FD) fclose(mDB.cccd1.FD);
 
-    if(NULL != sDB.mhzFD   ) fclose(sDB.mhzFD);
-    if(NULL != sDB.usgFD   ) fclose(sDB.usgFD);
-    if(NULL != sDB.ramFD   ) fclose(sDB.ramFD);
+    if(NULL != sDB.mhzFD)    fclose(sDB.mhzFD);
+    if(NULL != sDB.usgFD)    fclose(sDB.usgFD);
+    if(NULL != sDB.ramFD)    fclose(sDB.ramFD);
 }
 
 void num_exportDB(metricsType** const outDB) //------------------------------------------------------------ num_exportDB

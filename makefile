@@ -7,6 +7,7 @@ LD = gcc
 
 # App directories
 INC_DIR := .
+LIB_DIR := .
 SRC_DIR := .
 OUT_DIR := ./out
 
@@ -20,9 +21,9 @@ FLG :=
 
 # make
 $(TARGET):
-	mkdir -p out
+	mkdir -p $(OUT_DIR)
 	$(LD) $(SRC) $(INC) $(LIB) $(FLG) -o $(OUT_DIR)/$@ $^
 
 # clean
 clean:
-	rm -f $(OUT)
+	rm -rf $(OUT_DIR)
