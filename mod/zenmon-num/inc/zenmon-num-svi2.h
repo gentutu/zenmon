@@ -10,20 +10,21 @@
 #include "zenmon-types.h"
 
 //======================================================================================================================
-// API
+// API DECLARATIONS
 //======================================================================================================================
 // management
 void svi2_init(metricsType* const inDB);
+void svi2_deinit(void);
 
 // getters
-void svi2_getStatus(void);
+statusType svi2_getStatus(void);
 
 // handlers
-void svi2_setMinMax(void);
-void svi2_setAvg(void);
+statusType svi2_setMinMax(void);
+statusType svi2_setAvg(void);
 
 // printers
-void svi2_printTable(uint16 xPos, const uint16 yPos);
+statusType svi2_printTable(uint16 xPos, const uint16 yPos);
 
 //======================================================================================================================
 // END OF FILE

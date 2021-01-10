@@ -6,27 +6,27 @@
 //======================================================================================================================
 // INCLUDES
 //======================================================================================================================
-// dependency includes
+// generic includes
 #include "gen-types.h"
 
 // local includes
 #include "zenmon-types.h"
 
 //======================================================================================================================
-// API
+// API DECLARATIONS
 //======================================================================================================================
 // management
-void num_init(void);
-void num_deinit(void);
-void num_exportDB(metricsType** const outDB);
+void       num_init(void);
+void       num_deinit(void);
+statusType num_exportDB(metricsType** const outDB);
 
 // getters
-void num_getSvi2(void);
-void num_getLoad(void);
+statusType num_getSvi2(void);
+statusType num_getLoad(void);
 
 // printers
-void num_printSvi2(      uint16 xPos, const uint16 yPos);
-void num_printLoad(const uint16 xPos, const uint16 yPos);
+statusType num_printSvi2(      uint16 xPos, const uint16 yPos);
+statusType num_printLoad(const uint16 xPos, const uint16 yPos);
 
 //======================================================================================================================
 // END OF FILE

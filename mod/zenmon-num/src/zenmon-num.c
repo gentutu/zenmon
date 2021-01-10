@@ -10,7 +10,7 @@
 #include <fcntl.h>
 #include <sys/stat.h>
 
-// dependency includes
+// generic includes
 #include "logging.h"
 
 // local includes
@@ -22,28 +22,18 @@
 //======================================================================================================================
 // VARIABLES
 //======================================================================================================================
+static stateType num_state = DEINIT;
+
 static metricsType mDB; // svi2 metrics database
 static sysLoadType sDB; // system usage database
 
 //======================================================================================================================
-// FUNCTIONS
+// FUNCTION DECLARATIONS
 //======================================================================================================================
-static bool num_openFile(FILE** FD, const sint8* const name)
-{
-    if(-1 != access(name, F_OK))
-    {
-        *FD = fopen(name, "rb");
-        return FALSE;
-    }
-    else
-    {
-        PRINT_FAIL("File %s%s%s not found", F_RED, name, F_RST);
-        return TRUE;
-    }
-}
+static bool num_openFile(FILE** FD, const sint8* const name);
 
 //======================================================================================================================
-// API
+// API DEFINITIONS
 //======================================================================================================================
 void num_init(void) //----------------------------------------------------------------------------------------- num_init
 {
@@ -90,6 +80,8 @@ void num_init(void) //----------------------------------------------------------
     // point the sub-modules to the databases
     svi2_init(&mDB);
     load_init(&sDB);
+
+    num_state = INIT;
 }
 
 void num_deinit(void) //------------------------------------------------------------------------------------- num_deinit
@@ -109,39 +101,127 @@ void num_deinit(void) //--------------------------------------------------------
     if(NULL != sDB.mhzFD)    fclose(sDB.mhzFD);
     if(NULL != sDB.usgFD)    fclose(sDB.usgFD);
     if(NULL != sDB.ramFD)    fclose(sDB.ramFD);
+
+    num_state = DEINIT;
 }
 
-void num_exportDB(metricsType** const outDB) //------------------------------------------------------------ num_exportDB
+statusType num_exportDB(metricsType** const outDB) //------------------------------------------------------ num_exportDB
 {
-    *outDB = &mDB; // let the dot drawing functions access the metrics database
+    statusType status = NOK;
+
+    if(INIT == num_state)
+    {
+        *outDB = &mDB; // let the dot drawing functions access the metrics database
+
+        status = OK;
+    }
+    else
+    {
+        status = FEATURE_DISABLED;
+    }
+
+    return status;
 }
 
-void num_getSvi2(void) //----------------------------------------------------------------------------------- num_getSvi2
+statusType num_getSvi2(void) //----------------------------------------------------------------------------- num_getSvi2
 {
-    svi2_getStatus();
-    svi2_setMinMax();
-    svi2_setAvg();
+    statusType status = NOK;
+
+    if(INIT == num_state)
+    {
+        (void)svi2_getStatus();
+        (void)svi2_setMinMax();
+        (void)svi2_setAvg();
+
+        status = OK;
+    }
+    else
+    {
+        status = FEATURE_DISABLED;
+    }
+
+    return status;
 }
 
-void num_getLoad(void) //----------------------------------------------------------------------------------- num_getLoad
+statusType num_getLoad(void) //----------------------------------------------------------------------------- num_getLoad
 {
-    load_getCpuBar();
+    statusType status = NOK;
+
+    if(INIT == num_state)
+    {
+        (void)load_getCpuBar();
+
+        status = OK;
+    }
+    else
+    {
+        status = FEATURE_DISABLED;
+    }
+
+    return status;
 }
 
-void num_printSvi2(uint16 xPos, const uint16 yPos) //----------------------------------------------------- num_printSvi2
+statusType num_printSvi2(uint16 xPos, const uint16 yPos) //----------------------------------------------- num_printSvi2
 {
     // these hardcoded positions depend on where the static labels are printed in zenmon-box.c
 
-    svi2_printTable(xPos, yPos + 2u);
+    statusType status = NOK;
+
+    if(INIT == num_state)
+    {
+        (void)svi2_printTable(xPos, yPos + 2u);
+
+        status = OK;
+    }
+    else
+    {
+        status = FEATURE_DISABLED;
+    }
+
+    return status;
 }
 
-void num_printLoad(const uint16 xPos, const uint16 yPos) //----------------------------------------------- num_printLoad
+statusType num_printLoad(const uint16 xPos, const uint16 yPos) //----------------------------------------- num_printLoad
 {
     // these hardcoded positions depend on where the static labels are printed in zenmon-box.c
 
-    load_printSysInfo(xPos + 2u, yPos +  1u);
-    load_printRamBar( xPos + 2u, yPos +  7u);
-    load_printCpuBar( xPos + 2u, yPos + 11u);
+    statusType status = NOK;
+
+    if(INIT == num_state)
+    {
+        (void)load_printSysInfo(xPos + 2u, yPos +  1u);
+        (void)load_printRamBar( xPos + 2u, yPos +  7u);
+        (void)load_printCpuBar( xPos + 2u, yPos + 11u);
+
+        status = OK;
+    }
+    else
+    {
+        status = FEATURE_DISABLED;
+    }
+
+    return status;
+}
+
+//======================================================================================================================
+// FUNCTION DEFINITIONS
+//======================================================================================================================
+static bool num_openFile(FILE** FD, const sint8* const name) //-------------------------------------------- num_openFile
+{
+    bool failure;
+
+    if(-1 != access(name, F_OK))
+    {
+        *FD = fopen(name, "rb");
+        failure = FALSE;
+    }
+    else
+    {
+        PRINT_FAIL("File %s%s%s not found", F_RED, name, F_RST);
+        failure = TRUE;
+    }
+
+    return failure;
 }
 
 //======================================================================================================================
