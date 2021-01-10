@@ -9,25 +9,26 @@
 // system inclues
 #include <sys/sysinfo.h>
 
-// dependency includes
+// generic includes
 #include "gen-types.h"
 
 // local includes
 #include "zenmon-types.h"
 
 //======================================================================================================================
-// API
+// API DECLARATIONS
 //======================================================================================================================
 // management
 void load_init(sysLoadType* const inDB);
+void load_deinit(void);
 
 // getters; sysInfo and RAM do not need getters because their data does not depend on the previous polling cycle
-void load_getCpuBar(void);
+statusType load_getCpuBar(void);
 
 // printers
-void load_printSysInfo(const uint16 xPos, const uint16 yPos);
-void load_printRamBar( const uint16 xPos, const uint16 yPos);
-void load_printCpuBar( const uint16 xPos, const uint16 yPos);
+statusType load_printSysInfo(const uint16 xPos, const uint16 yPos);
+statusType load_printRamBar( const uint16 xPos, const uint16 yPos);
+statusType load_printCpuBar( const uint16 xPos, const uint16 yPos);
 
 //======================================================================================================================
 // END OF FILE

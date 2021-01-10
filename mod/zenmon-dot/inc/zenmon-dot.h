@@ -6,24 +6,25 @@
 //======================================================================================================================
 // INCLUDES
 //======================================================================================================================
-// dependency includes
+// generic includes
 #include "gen-types.h"
 
 // local includes
 #include "zenmon-types.h"
 
 //======================================================================================================================
-// API
+// API DECLARATIONS
 //======================================================================================================================
 // management
 void dot_init(void);
+void dot_deinit(void);
 
 // handlers
-void dot_refresh(void);
+statusType dot_refresh(void);
 
 // printers
-void dot_eGraph(uint16 xPos, const uint16 yPos);
-void dot_tGraph(uint16 xPos, const uint16 yPos);
+statusType dot_eGraph(uint16 xPos, const uint16 yPos);
+statusType dot_tGraph(uint16 xPos, const uint16 yPos);
 
 //======================================================================================================================
 // END OF FILE

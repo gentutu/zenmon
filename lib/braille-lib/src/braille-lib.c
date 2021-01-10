@@ -19,7 +19,9 @@
 //======================================================================================================================
 // VARIABLES
 //======================================================================================================================
-uint8 screenWidth;
+static stateType braille_state = DEINIT;
+
+static uint8 screenWidth;
 
 //======================================================================================================================
 // API
@@ -27,71 +29,108 @@ uint8 screenWidth;
 void braille_init(const uint8 width) //-------------------------------------------------------------------- braille_init
 {
     screenWidth = width;
+
+    braille_state = INIT;
 }
 
-void braille_dot(uint8* const graph, const uint16 xPos, const uint16 yPos) //------------------------------- braille_dot
+void braille_deinit(void) //----------------------------------------------------------------------------- braille_deinit
 {
+    braille_state = DEINIT;
+}
+
+statusType braille_dot(uint8* const graph, const uint16 xPos, const uint16 yPos) //------------------------- braille_dot
+{
+    statusType status = NOK;
+
     const uint16 xChar = xPos / 2u;
     const uint16 yChar = yPos / 4u;
 
-    // flip Braille dot
-    switch(yPos % 4u)
+    if(INIT == braille_state)
     {
-        case 3u: // A B
+        // flip Braille dot
+        switch(yPos % 4u)
         {
-            *(graph + (yChar * screenWidth) + xChar) |= (xPos & 1) ? FIELD_B : FIELD_A;
-            break;
+            case 3u: // A B
+            {
+                *(graph + (yChar * screenWidth) + xChar) |= (xPos & 1) ? FIELD_B : FIELD_A;
+                break;
+            }
+            case 2u: // C D
+            {
+                *(graph + (yChar * screenWidth) + xChar) |= (xPos & 1) ? FIELD_D : FIELD_C;
+                break;
+            }
+            case 1u: // E F
+            {
+                *(graph + (yChar * screenWidth) + xChar) |= (xPos & 1) ? FIELD_F : FIELD_E;
+                break;
+            }
+            case 0u: // G H
+            {
+                *(graph + (yChar * screenWidth) + xChar) |= (xPos & 1) ? FIELD_H : FIELD_G;
+                break;
+            }
         }
-        case 2u: // C D
-        {
-            *(graph + (yChar * screenWidth) + xChar) |= (xPos & 1) ? FIELD_D : FIELD_C;
-            break;
-        }
-        case 1u: // E F
-        {
-            *(graph + (yChar * screenWidth) + xChar) |= (xPos & 1) ? FIELD_F : FIELD_E;
-            break;
-        }
-        case 0u: // G H
-        {
-            *(graph + (yChar * screenWidth) + xChar) |= (xPos & 1) ? FIELD_H : FIELD_G;
-            break;
-        }
+
+        status = OK;
     }
+    else
+    {
+        status = FEATURE_DISABLED;
+    }
+
+    return status;
 }
 
-void braille_line(uint8* const graph, uint16 xPos1, uint16 yPos1, const uint16 xPos2, const uint16 yPos2) //braille_line
+statusType braille_line(uint8* const graph,       uint16 xPos1,       uint16 yPos1, \
+                                            const uint16 xPos2, const uint16 yPos2) //--------------------- braille_line
 {
+    statusType status = NOK;
+
     const uint16 xDelta = abs(xPos2 - xPos1);
     const uint16 yDelta = abs(yPos2 - yPos1);
     const  sint8 xDir   = (xPos1 < xPos2) ? 1 : -1;
     const  sint8 yDir   = (yPos1 < yPos2) ? 1 : -1;
 
-    sint16 eDelta = ((xDelta > yDelta) ? xDelta : -yDelta) / 2;
-    sint16 err    = 0;
+    sint16 eDelta;
+    sint16 err;
 
-    while(UNTIL_BREAK)
+    if(INIT == braille_state)
     {
-        braille_dot(graph, xPos1, yPos1);
+        eDelta = ((xDelta > yDelta) ? xDelta : -yDelta) / 2;
+        err    = 0;
 
-        if((xPos1 == xPos2) && (yPos1 == yPos2))
+        while(UNTIL_BREAK)
         {
-            break;
+            braille_dot(graph, xPos1, yPos1);
+
+            if((xPos1 == xPos2) && (yPos1 == yPos2))
+            {
+                break;
+            }
+
+            err = eDelta;
+            if(err > -xDelta)
+            {
+                eDelta -= yDelta;
+                xPos1  += xDir;
+            }
+
+            if(err < yDelta)
+            {
+                eDelta += xDelta;
+                yPos1  += yDir;
+            }
         }
 
-        err = eDelta;
-        if(err > -xDelta)
-        {
-            eDelta -= yDelta;
-            xPos1  += xDir;
-        }
-
-        if(err < yDelta)
-        {
-            eDelta += xDelta;
-            yPos1  += yDir;
-        }
+        status = OK;
     }
+    else
+    {
+        status = FEATURE_DISABLED;
+    }
+
+    return status;
 }
 
 //======================================================================================================================

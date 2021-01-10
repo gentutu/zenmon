@@ -1,5 +1,8 @@
 ## zenmon
 
+### Notice
+The current commit is untested as I am waiting for a replacement motherboard to come back in stock. My previous one was unstable at XMP speeds with QVL memory. There are no functionality updates, only some code restructuring and better state handling inside the modules.
+
 ### Introduction
 `zenmon` is a top-like CLI monitoring tool for AMD Ryzen CPUs written in C. It uses `k10temp` to display the electrical and temperature statistics of the CPU in a way that is pleasing to the eye, at least for me. It also displays generic information related to the overall system load:
 * Uptime
@@ -31,6 +34,7 @@ At this point I would consider it feature-complete. I will certainly maintain/im
 #### Dependencies
 * my shared code [repo](https://github.com/gentutu/common)
     * either clone it at the same level or update the `LIB_DIR` variable in the makefile
+    * submodules exist, but I do not like them
 * GNU `make`
 * *A* Ryzen CPU (see the section below)
 * `ncurses` is **not** needed; I did the cursor jumping myself

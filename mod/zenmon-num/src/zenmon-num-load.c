@@ -9,7 +9,7 @@
 #include <string.h>
 #include <sys/sysinfo.h>
 
-// dependency includes
+// generic includes
 #include "gen-types.h"
 #include "logging.h"
 
@@ -21,12 +21,203 @@
 //======================================================================================================================
 // VARIABLES
 //======================================================================================================================
+static stateType num_load_state = DEINIT;
+
 static sysLoadType* sDB;          // system usage database
 static uint8*       ramUsgFormat; // used to keep the "used/total" string centered
 static uint8        ramUsgOffset; // used to keep the "used/total" string centered
 
 //======================================================================================================================
-// FUNCTIONS
+// FUNCTION DECLARATIONS
+//======================================================================================================================
+static void load_getMemUsg();
+static void load_getCpuUsg(void);
+static void load_getCpuMhz(void);
+static void load_printCpuUsg(uint16 xPos, uint16 yPos, const cpuUsgType* array, const uint8 start, const uint8 end);
+static void load_printCpuMhz(uint16 xPos, uint16 yPos, const uint16*     array, const uint8 start, const uint8 end);
+
+//======================================================================================================================
+// API DEFINITIONS
+//======================================================================================================================
+void load_init(sysLoadType* const inDB) //-------------------------------------------------------------------- load_init
+{
+    sDB = inDB;
+
+    num_load_state = INIT;
+}
+
+void load_deinit(void) //----------------------------------------------------------------------------------- load_deinit
+{
+    num_load_state = DEINIT;
+}
+
+statusType load_getCpuBar(void) //----------------------------------------------------------------------- load_getCpuBar
+{
+    statusType status = NOK;
+
+    if(INIT == num_load_state)
+    {
+        load_getCpuUsg();
+        load_getCpuMhz();
+
+        status = OK;
+    }
+    else
+    {
+        status = FEATURE_DISABLED;
+    }
+
+    return status;
+}
+
+statusType load_printSysInfo(const uint16 xPos, const uint16 yPos) //--------------------------------- load_printSysInfo
+{
+    // data acquired here is not dependent on the last polling cycle
+    // so there is no need to acquire it when the terminal is too small to display the windows
+
+    // these hardcoded positions depend on where the static labels are printed in zenmon-box.c
+
+    statusType status = NOK;
+
+    struct sysinfo sysInfo;
+
+    if(INIT == num_load_state)
+    {
+        sysinfo(&sysInfo); // get updated values for uptime, processes and load
+
+        PRINTL(xPos + 11u, yPos + 2u, "%02ld:%02ld:%02ld", sysInfo.uptime / 3600u    , \
+                                                           sysInfo.uptime / 60u % 60u, \
+                                                           sysInfo.uptime       % 60u);
+        PRINTL(xPos + 11u, yPos + 3u, "%u"               , sysInfo.procs);
+        PRINTL(xPos + 11u, yPos + 4u, "%2.2f %2.2f %2.2f", sysInfo.loads[0] / ((float32)(1u << SI_LOAD_SHIFT)), \
+                                                           sysInfo.loads[1] / ((float32)(1u << SI_LOAD_SHIFT)), \
+                                                           sysInfo.loads[2] / ((float32)(1u << SI_LOAD_SHIFT)));
+
+        status = OK;
+    }
+    else
+    {
+        status = FEATURE_DISABLED;
+    }
+
+    return status;
+}
+
+statusType load_printRamBar(const uint16 xPos, const uint16 yPos) //----------------------------------- load_printRamBar
+{
+    // data acquired here is not dependent on last polling cycle
+    // so there is no need to acquire it when the terminal is too small to display the windows
+
+    // these hardcoded positions depend on where the static labels are printed in zenmon-box.c
+
+    statusType status = NOK;
+
+    const uint32 mibPerBox = (*sDB).ramAll / RAM_BAR_LEN; // worth in MiB of a box
+    const uint32 mibPerSeg =     mibPerBox / SEG_PER_BOX; // worth in MiB of a seg
+    const uint16      yBar = yPos + 2u;                   // start printing from the 2nd X coord
+
+    uint8     boxes;
+    uint8  boxIndex;
+    sint8*   colour;
+    uint16   segMiB;
+
+    if(INIT == num_load_state)
+    {
+        load_getMemUsg(); // call this first to avoid div/0
+
+        // RAM transformed in usage bar characters
+         boxes = (*sDB).ramUsg / mibPerBox; // boxes to fill
+        segMiB = (*sDB).ramUsg % mibPerBox; // MiB to display with segments
+        colour = F_RST;
+
+        PRINTL(xPos + ramUsgOffset, yPos + 1u, ramUsgFormat, (*sDB).ramUsg, (*sDB).ramAll); // print "used/total"
+
+        if((0u == boxes) && (mibPerSeg > segMiB)) segMiB = mibPerSeg; // make sure no bar is invisible
+
+        for(boxIndex = 0u; boxIndex < RAM_BAR_LEN; boxIndex++)
+        {
+            if(boxIndex >= RAM_BAR_LIM) colour = F_RED; // set the colour based on the progress through the entire bar
+
+            if(boxIndex < boxes) // print a full box
+            {
+                PRINTL(xPos + boxIndex, yBar, "%s%lc", colour, 0x2588);
+                continue;
+            }
+            else if(boxIndex == boxes) // print the last character, the segment, with 8 possible values
+            {
+                     if(segMiB <  mibPerSeg      ) { PRINTL(xPos + boxIndex, yBar, "%s "  , colour);         continue; }
+                else if(segMiB < (mibPerSeg * 2u)) { PRINTL(xPos + boxIndex, yBar, "%s%lc", colour, 0x258F); continue; }
+                else if(segMiB < (mibPerSeg * 3u)) { PRINTL(xPos + boxIndex, yBar, "%s%lc", colour, 0x258E); continue; }
+                else if(segMiB < (mibPerSeg * 4u)) { PRINTL(xPos + boxIndex, yBar, "%s%lc", colour, 0x258D); continue; }
+                else if(segMiB < (mibPerSeg * 5u)) { PRINTL(xPos + boxIndex, yBar, "%s%lc", colour, 0x258C); continue; }
+                else if(segMiB < (mibPerSeg * 6u)) { PRINTL(xPos + boxIndex, yBar, "%s%lc", colour, 0x258B); continue; }
+                else if(segMiB < (mibPerSeg * 7u)) { PRINTL(xPos + boxIndex, yBar, "%s%lc", colour, 0x258A); continue; }
+                else if(segMiB < (mibPerSeg * 8u)) { PRINTL(xPos + boxIndex, yBar, "%s%lc", colour, 0x2589); continue; }
+                else; // NOP; unreachable
+            }
+            else // clear the rest of the boxes in case RAM usage goes down
+            {
+                PRINTL(xPos + boxIndex, yBar, "%s ", colour);
+            }
+        }
+
+        status = OK;
+    }
+    else
+    {
+        status = FEATURE_DISABLED;
+    }
+
+    return status;
+}
+
+statusType load_printCpuBar(const uint16 xPos, const uint16 yPos) //----------------------------------- load_printCpuBar
+{
+    // these hardcoded positions depend on where the static labels are printed in zenmon-box.c
+
+    statusType status = NOK;
+
+    const uint16 yUsg = yPos + 1u;
+    const uint16 yMhz = yPos + 7u;
+
+    if(INIT == num_load_state)
+    {
+        // print usage bars for CCD0
+        load_printCpuUsg(xPos      , yUsg, (*sDB).cpuUsg,  0u,  3u); // print usg bars for 4 threads
+        load_printCpuUsg(xPos +  5u, yUsg, (*sDB).cpuUsg,  4u,  7u); // print usg bars for 4 threads
+        load_printCpuUsg(xPos + 10u, yUsg, (*sDB).cpuUsg,  8u, 11u); // print usg bars for 4 threads
+        load_printCpuUsg(xPos + 15u, yUsg, (*sDB).cpuUsg, 12u, 15u); // print usg bars for 4 threads
+
+        // print usage bars for CCD0
+        load_printCpuUsg(xPos + 24u, yUsg, (*sDB).cpuUsg, 16u, 19u); // print usg bars for 4 threads
+        load_printCpuUsg(xPos + 29u, yUsg, (*sDB).cpuUsg, 20u, 23u); // print usg bars for 4 threads
+        load_printCpuUsg(xPos + 34u, yUsg, (*sDB).cpuUsg, 24u, 27u); // print usg bars for 4 threads
+        load_printCpuUsg(xPos + 39u, yUsg, (*sDB).cpuUsg, 28u, 31u); // print usg bars for 4 threads
+
+        // print MHz bars for CCD0
+        load_printCpuMhz(xPos      , yMhz, (*sDB).cpuMhz,  0u,  1u); // print MHz bars for 2 cores
+        load_printCpuMhz(xPos +  5u, yMhz, (*sDB).cpuMhz,  2u,  3u); // print MHz bars for 2 cores
+        load_printCpuMhz(xPos + 10u, yMhz, (*sDB).cpuMhz,  4u,  5u); // print MHz bars for 2 cores
+        load_printCpuMhz(xPos + 15u, yMhz, (*sDB).cpuMhz,  6u,  7u); // print MHz bars for 2 cores
+
+        // print MHz bars for CCD0
+        load_printCpuMhz(xPos + 24u, yMhz, (*sDB).cpuMhz,  8u,  9u); // print MHz bars for 2 cores
+        load_printCpuMhz(xPos + 29u, yMhz, (*sDB).cpuMhz, 10u, 11u); // print MHz bars for 2 cores
+        load_printCpuMhz(xPos + 34u, yMhz, (*sDB).cpuMhz, 12u, 13u); // print MHz bars for 2 cores
+        load_printCpuMhz(xPos + 39u, yMhz, (*sDB).cpuMhz, 14u, 15u); // print MHz bars for 2 cores
+
+        status = OK;
+    }
+    else
+    {
+        status = FEATURE_DISABLED;
+    }
+
+    return status;
+}
+
+//======================================================================================================================
+// FUNCTION DEFINITIONS
 //======================================================================================================================
 static void load_getMemUsg() //-------------------------------------------------------------------------- load_getMemUsg
 {
@@ -163,7 +354,8 @@ static void load_getCpuMhz(void) //---------------------------------------------
     }
 }
 
-static void load_printCpuUsg(uint16 xPos, uint16 yPos, const cpuUsgType* array, const uint8 start, const uint8 end) // load_printCpuUsg
+static void load_printCpuUsg(      uint16 xPos ,       uint16 yPos, const cpuUsgType* array, \
+                             const uint8  start, const uint8  end) //---------------------------------- load_printCpuUsg
 {
     uint8     boxes; // boxes to fill
     uint16   segUsg; // usg (in permille) to display with segments
@@ -220,7 +412,8 @@ static void load_printCpuUsg(uint16 xPos, uint16 yPos, const cpuUsgType* array, 
     }
 }
 
-static void load_printCpuMhz(uint16 xPos, uint16 yPos, const uint16* array, const uint8 start, const uint8 end) // load_printCpuMhz
+static void load_printCpuMhz(      uint16 xPos ,       uint16 yPos, const uint16* array, \
+                             const uint8  start, const uint8  end) //---------------------------------- load_printCpuMhz
 {
     uint8     boxes; // boxes to fill
     uint16   segMhz; // MHz to display with segments
@@ -293,123 +486,6 @@ static void load_printCpuMhz(uint16 xPos, uint16 yPos, const uint16* array, cons
 
         xPos += 2;
     }
-}
-
-//======================================================================================================================
-// API
-//======================================================================================================================
-void load_init(sysLoadType* const inDB) //-------------------------------------------------------------------- load_init
-{
-    sDB = inDB;
-}
-
-void load_getCpuBar(void)
-{
-    load_getCpuUsg();
-    load_getCpuMhz();
-}
-
-void load_printSysInfo(const uint16 xPos, const uint16 yPos) //--------------------------------------- load_printSysInfo
-{
-    // data acquired here is not dependent on the last polling cycle
-    // so there is no need to acquire it when the terminal is too small to display the windows
-
-    // these hardcoded positions depend on where the static labels are printed in zenmon-box.c
-
-    struct sysinfo sysInfo;
-
-    sysinfo(&sysInfo); // get updated values for uptime, processes and load
-
-    PRINTL(xPos + 11u, yPos + 2u, "%02ld:%02ld:%02ld", sysInfo.uptime / 3600u    , \
-                                                       sysInfo.uptime / 60u % 60u, \
-                                                       sysInfo.uptime       % 60u);
-    PRINTL(xPos + 11u, yPos + 3u, "%u"               , sysInfo.procs);
-    PRINTL(xPos + 11u, yPos + 4u, "%2.2f %2.2f %2.2f", sysInfo.loads[0] / ((float)(1u << SI_LOAD_SHIFT)), \
-                                                       sysInfo.loads[1] / ((float)(1u << SI_LOAD_SHIFT)), \
-                                                       sysInfo.loads[2] / ((float)(1u << SI_LOAD_SHIFT)));
-}
-
-void load_printRamBar(const uint16 xPos, const uint16 yPos) //----------------------------------------- load_printRamBar
-{
-    // data acquired here is not dependent on last polling cycle
-    // so there is no need to acquire it when the terminal is too small to display the windows
-
-    // these hardcoded positions depend on where the static labels are printed in zenmon-box.c
-
-    load_getMemUsg(); // call this first to avoid div/0
-
-    // RAM transformed in usage bar characters
-    const uint32 mibPerBox = (*sDB).ramAll / RAM_BAR_LEN; // worth in MiB of a box
-    const uint32 mibPerSeg =     mibPerBox / SEG_PER_BOX; // worth in MiB of a seg
-    const uint16      yBar = yPos + 2u;                   // start printing from the 2nd X coord
-
-    uint8     boxes = (*sDB).ramUsg / mibPerBox; // boxes to fill
-    uint16   segMiB = (*sDB).ramUsg % mibPerBox; // MiB to display with segments
-    sint8*   colour = F_RST;
-    uint8  boxIndex;
-
-    PRINTL(xPos + ramUsgOffset, yPos + 1u, ramUsgFormat, (*sDB).ramUsg, (*sDB).ramAll); // print "used/total"
-
-    if((0u == boxes) && (mibPerSeg > segMiB)) segMiB = mibPerSeg; // make sure no bar is invisible
-
-    for(boxIndex = 0u; boxIndex < RAM_BAR_LEN; boxIndex++)
-    {
-        if(boxIndex >= RAM_BAR_LIM) colour = F_RED; // set the colour based on the progress through the entire bar
-
-        if(boxIndex < boxes) // print a full box
-        {
-            PRINTL(xPos + boxIndex, yBar, "%s%lc", colour, 0x2588);
-            continue;
-        }
-        else if(boxIndex == boxes) // print the last character, the segment, with 8 possible values
-        {
-                 if(segMiB <  mibPerSeg      ) { PRINTL(xPos + boxIndex, yBar, "%s "  , colour);         continue; }
-            else if(segMiB < (mibPerSeg * 2u)) { PRINTL(xPos + boxIndex, yBar, "%s%lc", colour, 0x258F); continue; }
-            else if(segMiB < (mibPerSeg * 3u)) { PRINTL(xPos + boxIndex, yBar, "%s%lc", colour, 0x258E); continue; }
-            else if(segMiB < (mibPerSeg * 4u)) { PRINTL(xPos + boxIndex, yBar, "%s%lc", colour, 0x258D); continue; }
-            else if(segMiB < (mibPerSeg * 5u)) { PRINTL(xPos + boxIndex, yBar, "%s%lc", colour, 0x258C); continue; }
-            else if(segMiB < (mibPerSeg * 6u)) { PRINTL(xPos + boxIndex, yBar, "%s%lc", colour, 0x258B); continue; }
-            else if(segMiB < (mibPerSeg * 7u)) { PRINTL(xPos + boxIndex, yBar, "%s%lc", colour, 0x258A); continue; }
-            else if(segMiB < (mibPerSeg * 8u)) { PRINTL(xPos + boxIndex, yBar, "%s%lc", colour, 0x2589); continue; }
-            else; // unreachable
-        }
-        else // clear the rest of the boxes in case RAM usage goes down
-        {
-            PRINTL(xPos + boxIndex, yBar, "%s ", colour);
-        }
-    }
-}
-
-void load_printCpuBar(const uint16 xPos, const uint16 yPos) //----------------------------------------- load_printCpuBar
-{
-    // these hardcoded positions depend on where the static labels are printed in zenmon-box.c
-
-    const uint16 yUsg = yPos + 1u;
-    const uint16 yMhz = yPos + 7u;
-
-    // print usage bars for CCD0
-    load_printCpuUsg(xPos      , yUsg, (*sDB).cpuUsg,  0u,  3u); // print usg bars for 4 threads
-    load_printCpuUsg(xPos +  5u, yUsg, (*sDB).cpuUsg,  4u,  7u); // print usg bars for 4 threads
-    load_printCpuUsg(xPos + 10u, yUsg, (*sDB).cpuUsg,  8u, 11u); // print usg bars for 4 threads
-    load_printCpuUsg(xPos + 15u, yUsg, (*sDB).cpuUsg, 12u, 15u); // print usg bars for 4 threads
-
-    // print usage bars for CCD0
-    load_printCpuUsg(xPos + 24u, yUsg, (*sDB).cpuUsg, 16u, 19u); // print usg bars for 4 threads
-    load_printCpuUsg(xPos + 29u, yUsg, (*sDB).cpuUsg, 20u, 23u); // print usg bars for 4 threads
-    load_printCpuUsg(xPos + 34u, yUsg, (*sDB).cpuUsg, 24u, 27u); // print usg bars for 4 threads
-    load_printCpuUsg(xPos + 39u, yUsg, (*sDB).cpuUsg, 28u, 31u); // print usg bars for 4 threads
-
-    // print MHz bars for CCD0
-    load_printCpuMhz(xPos      , yMhz, (*sDB).cpuMhz,  0u,  1u); // print MHz bars for 2 cores
-    load_printCpuMhz(xPos +  5u, yMhz, (*sDB).cpuMhz,  2u,  3u); // print MHz bars for 2 cores
-    load_printCpuMhz(xPos + 10u, yMhz, (*sDB).cpuMhz,  4u,  5u); // print MHz bars for 2 cores
-    load_printCpuMhz(xPos + 15u, yMhz, (*sDB).cpuMhz,  6u,  7u); // print MHz bars for 2 cores
-
-    // print MHz bars for CCD0
-    load_printCpuMhz(xPos + 24u, yMhz, (*sDB).cpuMhz,  8u,  9u); // print MHz bars for 2 cores
-    load_printCpuMhz(xPos + 29u, yMhz, (*sDB).cpuMhz, 10u, 11u); // print MHz bars for 2 cores
-    load_printCpuMhz(xPos + 34u, yMhz, (*sDB).cpuMhz, 12u, 13u); // print MHz bars for 2 cores
-    load_printCpuMhz(xPos + 39u, yMhz, (*sDB).cpuMhz, 14u, 15u); // print MHz bars for 2 cores
 }
 
 //======================================================================================================================

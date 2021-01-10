@@ -7,7 +7,7 @@
 #include <stdio.h>
 #include <sys/utsname.h>
 
-// dependency includes
+// generic includes
 #include "braille-lib.h"
 
 // local includes
@@ -15,34 +15,13 @@
 #include "zenmon-box.h"
 
 //======================================================================================================================
-// FUNCTIONS
+// FUNCTION DECLARATIONS
 //======================================================================================================================
 static void box_draw(const uint16 xPos , const uint16 yPos , \
-                     const uint16 xSize, const uint16 ySize, const sint8* colour) //--------------------------- box_draw
-{
-    uint16 index;
-
-    // draw corners
-    PRINTL(xPos             , yPos             , "%s%lc", colour, 0x250C);
-    PRINTL(xPos + xSize - 1u, yPos             , "%s%lc", colour, 0x2510);
-    PRINTL(xPos             , yPos + ySize - 1u, "%s%lc", colour, 0x2514);
-    PRINTL(xPos + xSize - 1u, yPos + ySize - 1u, "%s%lc", colour, 0x2518);
-
-    // draw sides
-    for(index = xPos + 1; index < (xPos + xSize - 1); index++)
-    {
-        PRINTL(index, yPos             , "%s%lc", colour, 0x2500);
-        PRINTL(index, yPos + ySize - 1u, "%s%lc", colour, 0x2500);
-    }
-    for(index = yPos + 1; index < (yPos + ySize - 1); index++)
-    {
-        PRINTL(xPos             , index, "%s%lc", colour, 0x2502);
-        PRINTL(xPos + xSize - 1u, index, "%s%lc", colour, 0x2502);
-    }
-}
+                     const uint16 xSize, const uint16 ySize, const sint8* colour);
 
 //======================================================================================================================
-// API
+// API DEFINITIONS
 //======================================================================================================================
 void box_svi2(const sint8* title, uint16 xPos, uint16 yPos, const sint8* colour) //---------------------------- box_svi2
 {
@@ -108,6 +87,33 @@ void box_tGraph(const sint8* title, uint16 const xPos, const uint16 yPos, const 
 {
     box_draw(xPos, yPos, LEN_TEMP_W_X, LEN_TEMP_W_Y, colour);
     PRINTL(xPos + 2u, yPos, " %s ", title);
+}
+
+//======================================================================================================================
+// FUNCTION DEFINITIONS
+//======================================================================================================================
+static void box_draw(const uint16 xPos , const uint16 yPos , \
+                     const uint16 xSize, const uint16 ySize, const sint8* colour) //--------------------------- box_draw
+{
+    uint16 index;
+
+    // draw corners
+    PRINTL(xPos             , yPos             , "%s%lc", colour, 0x250C);
+    PRINTL(xPos + xSize - 1u, yPos             , "%s%lc", colour, 0x2510);
+    PRINTL(xPos             , yPos + ySize - 1u, "%s%lc", colour, 0x2514);
+    PRINTL(xPos + xSize - 1u, yPos + ySize - 1u, "%s%lc", colour, 0x2518);
+
+    // draw sides
+    for(index = xPos + 1; index < (xPos + xSize - 1); index++)
+    {
+        PRINTL(index, yPos             , "%s%lc", colour, 0x2500);
+        PRINTL(index, yPos + ySize - 1u, "%s%lc", colour, 0x2500);
+    }
+    for(index = yPos + 1; index < (yPos + ySize - 1); index++)
+    {
+        PRINTL(xPos             , index, "%s%lc", colour, 0x2502);
+        PRINTL(xPos + xSize - 1u, index, "%s%lc", colour, 0x2502);
+    }
 }
 
 //======================================================================================================================
