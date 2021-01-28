@@ -1,10 +1,12 @@
 ## zenmon
 
 ### Notice
-The current commit is untested as I am waiting for a replacement motherboard to come back in stock. My previous one was unstable at XMP speeds with QVL memory. There are no functionality updates, only some code restructuring and better state handling inside the modules.
+~~The current commit is untested as I am waiting for a replacement motherboard to come back in stock. My previous one was unstable at XMP speeds with QVL memory. There are no functionality updates, only some code restructuring and better state handling inside the modules.~~
+
+The new motherboard came in (X570 Aorus Master) and I am getting some odd behaviour with data acquisition; see the **Issues** section.
 
 ### Introduction
-`zenmon` is a top-like CLI monitoring tool for AMD Ryzen CPUs written in C. It uses `k10temp` to display the electrical and temperature statistics of the CPU in a way that is pleasing to the eye, at least for me. It also displays generic information related to the overall system load:
+`zenmon` is a top-like CLI monitoring tool for AMD Ryzen CPUs written in C. It uses `k10temp` or `zenpower` to display the electrical and temperature statistics of the CPU in a way that is pleasing to the eye, at least for me. It also displays generic information related to the overall system load:
 * Uptime
 * Number of processes
 * CPU usage for the past 1, 5 and 15 minutes
@@ -43,11 +45,11 @@ At this point I would consider it feature-complete. I will certainly maintain/im
 * Supported out-of-the-box:
     * AMD Ryzen 9 3950X and 5950X
 * Supported after changing some code:
-    * Any other Ryzen CPU that `k10temp` supports with voltage, current and temperature
+    * Any other Ryzen CPU that `k10temp` or `zenpower` support with voltage, current and temperature
     * There are no hard dependencies on Ryzen CPUs, so with *slight* reworks of the data acquisition and display components it will work on pretty much anything
 
 #### More on the topic of compatible CPUs
-* It all depends on the files `k10temp` exposes; for the supported CPUs the files are as follows:
+* It all depends on the files `k10temp` or `zenpower` expose; for the supported CPUs the files are as follows:
     * core voltage: in0_input
     * core current: curr1_input
     * soc voltage: in1_input
@@ -56,7 +58,7 @@ At this point I would consider it feature-complete. I will certainly maintain/im
     * ctl temperature: temp2_input
     * ccd0 temperature: temp3_input
     * ccd1 temperature: temp4_input
-* In case of other Ryzen CPUs, whatever `k10temp` decides to expose can be read by `zenmon`
+* In case of other Ryzen CPUs, whatever `k10temp` or `zenpower` decide to expose can be read by `zenmon`
 * At run-time, all the required system files are checked; if any are missing, `zenmon` will notify and exit gracefully
 * The only Ryzen CPU I have access to is my 3950X, so this is what I can fully test it on
 
@@ -79,7 +81,7 @@ Call it from the newly-created `out` directory and it will run with a sample rat
 
 ---
 ### Issues
-* This piece of software contains only features
+* This piece of software contains only features, except for the odd behaviour I am getting across different motherboards from Asus and Gigabyte. `k10temp` *might* not expose the required SVI2 data, in which case use replace it with `zenpower`
 
 ---
 ### Limitations
@@ -103,4 +105,5 @@ Licensed under the GPLv3: http://www.gnu.org/licenses/gpl-3.0.html
 
 ---
 ### Credits
+* `zenpower` for exposing the required SVI2 data: https://github.com/ocerman/zenpower
 * The Braille character handling from braille-lib.h and braille-lib.c have been adapted from https://github.com/dcat/tplot

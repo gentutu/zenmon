@@ -110,12 +110,10 @@ statusType svi2_setAvg(void) //-------------------------------------------------
 {
     statusType status = NOK;
 
-    static uint8 waitCycles;
+    static uint8 waitCycles = 1u;
 
     if(INIT == num_svi2_state)
     {
-        waitCycles = 1u;
-
         if(AVG_CYCLES < waitCycles) // wait 10 cycles
         {
             // electrical
