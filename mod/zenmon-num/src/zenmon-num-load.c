@@ -112,18 +112,21 @@ statusType load_printRamBar(const uint16 xPos, const uint16 yPos) //------------
 
     statusType status = NOK;
 
-    const uint32 mibPerBox = (*sDB).ramAll / RAM_BAR_LEN; // worth in MiB of a box
-    const uint32 mibPerSeg =     mibPerBox / SEG_PER_BOX; // worth in MiB of a seg
-    const uint16      yBar = yPos + 2u;                   // start printing from the 2nd X coord
-
-    uint8     boxes;
-    uint8  boxIndex;
-    sint8*   colour;
-    uint16   segMiB;
+    uint32 mibPerBox;
+    uint32 mibPerSeg;
+    uint16      yBar;
+    uint8      boxes;
+    uint8   boxIndex;
+    sint8*    colour;
+    uint16    segMiB;
 
     if(INIT == num_load_state)
     {
         load_getMemUsg(); // call this first to avoid div/0
+
+        mibPerBox = (*sDB).ramAll / RAM_BAR_LEN; // worth in MiB of a box
+        mibPerSeg =     mibPerBox / SEG_PER_BOX; // worth in MiB of a seg
+             yBar = yPos + 2u;                   // start printing from the 2nd X coord
 
         // RAM transformed in usage bar characters
          boxes = (*sDB).ramUsg / mibPerBox; // boxes to fill
@@ -232,7 +235,7 @@ static void load_getMemUsg() //-------------------------------------------------
         // this if is VERY barbaric, but it's much faster than strstr
         if(('F' == line[3]) && ('r' == line[4])) // found "MemFree"
         {
-            freeMem = ((atoi(line + RAM_AVAIL_OFFSET) / 1000u)); // MiB
+            freeMem += ((atoi(line + RAM_AVAIL_OFFSET) / 1000u)); // MiB
             continue;
         }
         else if(('f' == line[2]) && ('f' == line[3])) // found "Buffers"
@@ -254,7 +257,7 @@ static void load_getMemUsg() //-------------------------------------------------
             else if(10000u   > (*sDB).ramAll) { ramUsgOffset = 17u; ramUsgFormat = "%4u/%4u"; }
             else if(100000u  > (*sDB).ramAll) { ramUsgOffset = 16u; ramUsgFormat = "%5u/%5u"; }
             else if(1000000u > (*sDB).ramAll) { ramUsgOffset = 15u; ramUsgFormat = "%6u/%6u"; }
-            else                              { ramUsgOffset =  7u; ramUsgFormat = "your amount of RAM is extreme"; }
+            else                              { ramUsgOffset =  7u; ramUsgFormat = "too much RAM"; }
 
             checkedOnce = TRUE; // never reachable again after this
         }
