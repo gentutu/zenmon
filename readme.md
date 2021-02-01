@@ -1,10 +1,5 @@
 ## zenmon
 
-### Notice
-~~The current commit is untested as I am waiting for a replacement motherboard to come back in stock. My previous one was unstable at XMP speeds with QVL memory. There are no functionality updates, only some code restructuring and better state handling inside the modules.~~
-
-The new motherboard came in (X570 Aorus Master) and I am getting some odd behaviour with data acquisition; see the **Issues** section.
-
 ### Introduction
 `zenmon` is a top-like CLI monitoring tool for AMD Ryzen CPUs written in C. It uses `k10temp` or `zenpower` to display the electrical and temperature statistics of the CPU in a way that is pleasing to the eye, at least for me. It also displays generic information related to the overall system load:
 * Uptime
@@ -81,7 +76,7 @@ Call it from the newly-created `out` directory and it will run with a sample rat
 
 ---
 ### Issues
-* This piece of software contains only features, except for the odd behaviour I am getting across different motherboards from Asus and Gigabyte. `k10temp` *might* not expose the required SVI2 data, in which case use replace it with `zenpower`
+* This piece of software contains only features, except for the odd behaviour I am getting across different motherboards from Asus and Gigabyte. `k10temp` *might* not expose the required SVI2 data, in which case replace it with `zenpower`
 
 ---
 ### Limitations
@@ -106,4 +101,5 @@ Licensed under the GPLv3: http://www.gnu.org/licenses/gpl-3.0.html
 ---
 ### Credits
 * `zenpower` for exposing the required SVI2 data: https://github.com/ocerman/zenpower
+* Aidan Harris (https://github.com/aidanharris) for a GCC-10 fix which I have mistakenly overwritten during a rebase
 * The Braille character handling from braille-lib.h and braille-lib.c have been adapted from https://github.com/dcat/tplot
